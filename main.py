@@ -43,16 +43,48 @@ def main():
     plt.subplots_adjust(bottom=0.15)
     plt.xticks(np.arange(0, len(macd) + 1, 10))
     plt.xticks(rotation=30)
-    plt.plot(dates, macd)
     plt.plot(dates, macd, label="MACD")
     plt.plot(dates, signal, label="SIGNAL")
+    plt.legend(loc='best')
     plt.show()
 
     plt.subplots_adjust(bottom=0.15)
     plt.xticks(np.arange(0, len(prices) + 1, 10))
     plt.xticks(rotation=30)
-    plt.plot(dates, prices)
+    plt.plot(dates, prices, label="Stock price")
+    plt.legend(loc='best')
     plt.show()
+
+    money = 1000
+    stocks = 0
+    buying = True
+    # I should buy or sell when SIGNAL intersects MACD.
+    # Days when I trade stocks will be marked as points
+    trade_points = pd.DataFrame(index=np.arange(1000), columns=np.arange(1))
+    # detect intersection by change in sign of difference
+    d = macd - signal
+    for i in range(35, 999):
+        if float(d.iloc[i]) == 0. or float(d.iloc[i]) * float(d.iloc[i+1]) < 0.:
+            trade_points.iloc[i] = macd.iloc[i]
+            # crossover at i
+            if buying:
+                stocks = math.floor(money / prices.iloc[i])
+                money -= stocks * prices.iloc[i]
+            else:
+                money += stocks * prices.iloc[i]
+                stocks = 0
+            buying = not buying
+    print(round(money, 2))
+
+    plt.subplots_adjust(bottom=0.15)
+    plt.xticks(np.arange(0, len(macd) + 1, 10))
+    plt.xticks(rotation=30)
+    plt.plot(dates, trade_points, 'bo', label="Intersections")
+    plt.plot(dates, macd, label="MACD")
+    plt.plot(dates, signal, label="SIGNAL")
+    plt.legend(loc='best')
+    plt.show()
+
 
 if __name__ == '__main__':
     main()

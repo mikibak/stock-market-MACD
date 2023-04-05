@@ -1,4 +1,4 @@
-# StockMarketMACD
+# stock-market-MACD 
 
 ### Zadanie
 
